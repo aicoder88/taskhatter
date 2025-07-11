@@ -139,7 +139,7 @@ const seedTasks: Task[] = [
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(seedTasks);
-  const [showCompleted, setShowCompleted] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
   const handleAddTask = (newTask: Omit<Task, "id" | "status">) => {
@@ -199,7 +199,7 @@ export default function Home() {
             <img
               src="/logo-light-sm.png"
               alt="Hatter Pulse Logo"
-              className="h-12 w-12 mr-4 rounded-lg shadow-lg"
+              className="h-16 w-16 mr-4 rounded-lg shadow-lg"
             />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
@@ -210,7 +210,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="flex flex-col md:flex-row items-center gap-4 relative z-10">
             <Button
               onClick={() => setIsAddTaskModalOpen(true)}
               className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none backdrop-blur-md shadow-lg transition-all duration-200"
