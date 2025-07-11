@@ -1,0 +1,398 @@
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Textarea } from "./ui/textarea";
+
+interface Task {
+  id: string;
+  title: string;
+  owner: string;
+  priority: "High" | "Medium" | "Low";
+  dueDate: string;
+  cost: number;
+  ratingBump: number;
+  status: "active" | "completed" | "waiting";
+  description?: string;
+}
+
+interface TaskSidebarProps {
+  task?: Task;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (task: Task) => void;
+}
+
+const TaskSidebar = (
+  { task, isOpen, onClose, onSave }: TaskSidebarProps = {
+    isOpen: true,
+    onClose: () => {},
+    onSave: () => {},
+  },
+) => {
+  const [editedTask, setEditedTask] = useState<Task>({
+    id: "sample-task-1",
+    title: "Deep Clean Bar Area",
+    owner: "Bar Mgr",
+    priority: "High",
+    dueDate: "2024-01-15",
+    cost: 150,
+    ratingBump: 0.3,
+    status: "active",
+    description:
+      "Thorough cleaning of bar area including equipment sanitization and inventory organization",
+  });
+
+  useEffect(() => {
+    if (task) {
+      setEditedTask(task);
+    }
+  }, [task]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setEditedTask((prev) => ({
+      ...prev,
+      [name]:
+        name === "cost" || name === "ratingBump"
+          ? parseFloat(value) || 0
+          : value,
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setEditedTask((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    onSave(editedTask);
+    onClose();
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "High":
+        return "text-red-400";
+      case "Medium":
+        return "text-yellow-400";
+      case "Low":
+        return "text-green-400";
+      default:
+        return "text-gray-400";
+    }
+  };
+
+  return (
+    <div className="bg-black min-h-screen p-4">
+      <motion.div
+        className={`fixed top-0 right-0 h-full w-[420px] bg-black/80 backdrop-blur-xl border-l border-white/20 shadow-2xl z-50 overflow-y-auto ${isOpen ? "block" : "hidden"}`}
+        initial={{ x: 420 }}
+        animate={{ x: isOpen ? 0 : 420 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+      >
+        <div className="p-6 h-full flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">
+                Task Details
+              </h2>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-sm font-medium ${getPriorityColor(editedTask.priority)}`}
+                >
+                  {editedTask.priority} Priority
+                </span>
+                <span className="text-gray-400 text-sm">•</span>
+                <span className="text-gray-400 text-sm">
+                  {editedTask.status === "active"
+                    ? "Active"
+                    : editedTask.status === "waiting"
+                      ? "Waiting"
+                      : "Completed"}
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Form Fields */}
+          <div className="space-y-6 flex-grow">
+            <div className="space-y-3">
+              <Label htmlFor="title" className="text-white font-medium">
+                Task Title
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                value={editedTask.title}
+                onChange={handleChange}
+                className="bg-white/5 border-white/20 text-white placeholder:text-gray-500 focus:border-emerald-400/50 focus:ring-emerald-400/20 transition-all"
+                placeholder="Enter task title..."
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="description" className="text-white font-medium">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={editedTask.description || ""}
+                onChange={handleChange}
+                className="bg-white/5 border-white/20 text-white placeholder:text-gray-500 focus:border-emerald-400/50 focus:ring-emerald-400/20 transition-all min-h-[120px] resize-none"
+                placeholder="Describe the task details..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <Label htmlFor="owner" className="text-white font-medium">
+                  Owner
+                </Label>
+                <Select
+                  value={editedTask.owner}
+                  onValueChange={(value) => handleSelectChange("owner", value)}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/20 text-white focus:border-emerald-400/50 focus:ring-emerald-400/20">
+                    <SelectValue placeholder="Select owner" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-white/20">
+                    <SelectItem
+                      value="JP"
+                      className="text-white hover:bg-white/10"
+                    >
+                      JP
+                    </SelectItem>
+                    <SelectItem
+                      value="ALAINE"
+                      className="text-white hover:bg-white/10"
+                    >
+                      ALAINE
+                    </SelectItem>
+                    <SelectItem
+                      value="COLIN"
+                      className="text-white hover:bg-white/10"
+                    >
+                      COLIN
+                    </SelectItem>
+                    <SelectItem
+                      value="ABBY"
+                      className="text-white hover:bg-white/10"
+                    >
+                      ABBY
+                    </SelectItem>
+                    <SelectItem
+                      value="EMMA"
+                      className="text-white hover:bg-white/10"
+                    >
+                      EMMA
+                    </SelectItem>
+                    <SelectItem
+                      value="NOAH"
+                      className="text-white hover:bg-white/10"
+                    >
+                      NOAH
+                    </SelectItem>
+                    <SelectItem
+                      value="ALI"
+                      className="text-white hover:bg-white/10"
+                    >
+                      ALI
+                    </SelectItem>
+                    <SelectItem
+                      value="NATE"
+                      className="text-white hover:bg-white/10"
+                    >
+                      NATE
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="priority" className="text-white font-medium">
+                  Priority
+                </Label>
+                <Select
+                  value={editedTask.priority}
+                  onValueChange={(value) =>
+                    handleSelectChange(
+                      "priority",
+                      value as "High" | "Medium" | "Low",
+                    )
+                  }
+                >
+                  <SelectTrigger className="bg-white/5 border-white/20 text-white focus:border-emerald-400/50 focus:ring-emerald-400/20">
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-white/20">
+                    <SelectItem
+                      value="High"
+                      className="text-red-400 hover:bg-white/10"
+                    >
+                      High
+                    </SelectItem>
+                    <SelectItem
+                      value="Medium"
+                      className="text-yellow-400 hover:bg-white/10"
+                    >
+                      Medium
+                    </SelectItem>
+                    <SelectItem
+                      value="Low"
+                      className="text-green-400 hover:bg-white/10"
+                    >
+                      Low
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="dueDate" className="text-white font-medium">
+                Due Date
+              </Label>
+              <Input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                value={editedTask.dueDate}
+                onChange={handleChange}
+                className="bg-white/5 border-white/20 text-white focus:border-emerald-400/50 focus:ring-emerald-400/20 transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <Label htmlFor="cost" className="text-white font-medium">
+                  Cost (CAD)
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    $
+                  </span>
+                  <Input
+                    id="cost"
+                    name="cost"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editedTask.cost}
+                    onChange={handleChange}
+                    className="bg-white/5 border-white/20 text-white pl-8 focus:border-emerald-400/50 focus:ring-emerald-400/20 transition-all"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="ratingBump" className="text-white font-medium">
+                  Rating Bump
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    +
+                  </span>
+                  <Input
+                    id="ratingBump"
+                    name="ratingBump"
+                    type="number"
+                    min="0"
+                    step="0.05"
+                    max="1"
+                    value={editedTask.ratingBump}
+                    onChange={handleChange}
+                    className="bg-white/5 border-white/20 text-white pl-8 focus:border-emerald-400/50 focus:ring-emerald-400/20 transition-all"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="status" className="text-white font-medium">
+                Status
+              </Label>
+              <Select
+                value={editedTask.status}
+                onValueChange={(value) =>
+                  handleSelectChange(
+                    "status",
+                    value as "active" | "completed" | "waiting",
+                  )
+                }
+              >
+                <SelectTrigger className="bg-white/5 border-white/20 text-white focus:border-emerald-400/50 focus:ring-emerald-400/20">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-900 border-white/20">
+                  <SelectItem
+                    value="active"
+                    className="text-white hover:bg-white/10"
+                  >
+                    🚀 Active
+                  </SelectItem>
+                  <SelectItem
+                    value="waiting"
+                    className="text-yellow-400 hover:bg-white/10"
+                  >
+                    ⏳ Waiting
+                  </SelectItem>
+                  <SelectItem
+                    value="completed"
+                    className="text-green-400 hover:bg-white/10"
+                  >
+                    ✅ Completed
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-white/10">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-emerald-500/25 transition-all px-6"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default TaskSidebar;
