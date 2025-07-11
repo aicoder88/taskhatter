@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
@@ -58,6 +58,29 @@ const TaskSidebar = (
     }
   }, [task]);
 
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    if (!task) return false;
+    return JSON.stringify(task) !== JSON.stringify(editedTask);
+  }, [task, editedTask]);
+
+  // Add keyboard shortcut for saving (Ctrl+S or Cmd+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (hasUnsavedChanges) {
+          handleSave();
+        }
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, hasUnsavedChanges]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -79,6 +102,21 @@ const TaskSidebar = (
   };
 
   const handleSave = () => {
+    // Validate required fields before saving
+    if (!editedTask.title.trim()) {
+      alert('Task title is required');
+      return;
+    }
+    if (!editedTask.owner) {
+      alert('Task owner is required');
+      return;
+    }
+    if (!editedTask.dueDate) {
+      alert('Due date is required');
+      return;
+    }
+    
+    // Save the task
     onSave(editedTask);
     onClose();
   };
@@ -104,7 +142,7 @@ const TaskSidebar = (
         animate={{ x: isOpen ? 0 : 420 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
       >
-        <div className="p-6 h-full flex flex-col">
+        <div className="p-6 h-full flex flex-col min-h-full">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -371,23 +409,43 @@ const TaskSidebar = (
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Save Button - Positioned right after Status field */}
+            <div className="space-y-3 pt-4">
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleSave}
+                  disabled={!hasUnsavedChanges}
+                  title={hasUnsavedChanges ? "Save Changes (Ctrl+S)" : "No changes to save"}
+                  className={`${
+                    hasUnsavedChanges
+                      ? "bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-emerald-500/25 animate-pulse"
+                      : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                  } transition-all px-8 py-3 font-semibold text-lg relative w-full max-w-xs`}
+                >
+                  💾 Save Changes
+                  {hasUnsavedChanges && (
+                    <>
+                      <span className="ml-2 inline-block w-2 h-2 bg-orange-400 rounded-full animate-ping"></span>
+                      <span className="ml-2 text-xs opacity-75">(Ctrl+S)</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-white/10">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all px-6"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-emerald-500/25 transition-all px-6"
-            >
-              Save Changes
-            </Button>
+          {/* Cancel Button - At bottom */}
+          <div className="sticky bottom-0 bg-black/90 backdrop-blur-md border-t border-white/20 p-4 -mx-6 -mb-6 mt-auto">
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all px-6"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         </div>
       </motion.div>
