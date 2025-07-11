@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import AddTaskModal from "./AddTaskModal";
+import DashboardHeader from "./dashboard/DashboardHeader";
 import { motion } from "framer-motion";
 
 interface Task {
@@ -15,6 +16,10 @@ interface Task {
   cost: number;
   ratingBump: number;
   status: "active" | "completed" | "waiting";
+  complaint?: string;
+  sources?: string[];
+  inspiration?: string;
+  mentions?: number;
 }
 
 const seedTasks: Task[] = [
@@ -27,6 +32,10 @@ const seedTasks: Task[] = [
     cost: 2000,
     ratingBump: 0.3,
     status: "active",
+    complaint: "Bathroom was very disgusting… tables and ground are sticky.",
+    sources: ["Google Apr 19 2025", "Yelp May 8 2024", "Google May 6 2025", "Google Dec 20 2024", "Resto Jul 2 2025"],
+    inspiration: "Google Reviews & Yelp",
+    mentions: 5,
   },
   {
     id: "2",
@@ -37,6 +46,10 @@ const seedTasks: Task[] = [
     cost: 300,
     ratingBump: 0.25,
     status: "active",
+    complaint: "Ordered a double vodka-coke and got straight Coke – no vodka.",
+    sources: ["Yelp Aug 17 2024", "Yelp May 8 2024", "Reddit thread complaints 2025"],
+    inspiration: "Yelp Reviews",
+    mentions: 3,
   },
   {
     id: "3",
@@ -47,6 +60,10 @@ const seedTasks: Task[] = [
     cost: 1800,
     ratingBump: 0.2,
     status: "active",
+    complaint: "Bouncer picked my friend up and raised his fist at me.",
+    sources: ["Google Feb 18 2025 (highlighted on Wanderlog)"],
+    inspiration: "Google Reviews",
+    mentions: 1,
   },
   {
     id: "4",
@@ -57,6 +74,10 @@ const seedTasks: Task[] = [
     cost: 3500,
     ratingBump: 0.15,
     status: "active",
+    complaint: "Lean on a table and it breaks in 3 pieces.",
+    sources: ["Resto Jul 2 2025", "Yelp May 8 2024", "Google Apr 19 2025"],
+    inspiration: "Multiple Review Platforms",
+    mentions: 3,
   },
   {
     id: "5",
@@ -67,6 +88,10 @@ const seedTasks: Task[] = [
     cost: 4800,
     ratingBump: 0.1,
     status: "active",
+    complaint: "Waited ages, couldn't even pay at the bar.",
+    sources: ["Yelp Jul 25 2018", "Google Dec 20 2024", "Yelp Jul 2 2022"],
+    inspiration: "Yelp Reviews",
+    mentions: 3,
   },
   {
     id: "6",
@@ -77,6 +102,10 @@ const seedTasks: Task[] = [
     cost: 500,
     ratingBump: 0.05,
     status: "active",
+    complaint: "Bartender took food order, came back: kitchen's been closed the whole time.",
+    sources: ["Yelp Jul 2 2022", "Wanderlog highlight Jan 2025"],
+    inspiration: "Yelp & Wanderlog",
+    mentions: 2,
   },
   {
     id: "7",
@@ -87,6 +116,10 @@ const seedTasks: Task[] = [
     cost: 0,
     ratingBump: 0.05,
     status: "active",
+    complaint: "Music was too loud to talk… we kept our coats on.",
+    sources: ["Google Dec 20 2024", "multiple Google 3★ reviews 2024-25"],
+    inspiration: "Google Reviews",
+    mentions: 2,
   },
   {
     id: "8",
@@ -97,12 +130,16 @@ const seedTasks: Task[] = [
     cost: 1200,
     ratingBump: 0.12,
     status: "completed",
+    complaint: "System crashes during busy periods, causing delays.",
+    sources: ["Internal Staff Reports"],
+    inspiration: "Staff Feedback",
+    mentions: 1,
   },
 ];
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(seedTasks);
-  const [showCompleted, setShowCompleted] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
   const handleAddTask = (newTask: Omit<Task, "id" | "status">) => {
@@ -135,6 +172,10 @@ export default function Home() {
       };
       setTasks([...tasks, duplicatedTask]);
     }
+  };
+
+  const handleReorderTasks = (reorderedTasks: Task[]) => {
+    setTasks(reorderedTasks);
   };
 
   return (
@@ -187,12 +228,16 @@ export default function Home() {
           </div>
         </header>
 
+        {/* Dashboard Header with Visualizations */}
+        <DashboardHeader tasks={tasks} className="mb-6" />
+
         <TaskBoard
           tasks={tasks}
           showCompleted={showCompleted}
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}
           onDuplicateTask={handleDuplicateTask}
+          onReorderTasks={handleReorderTasks}
         />
 
         <AddTaskModal

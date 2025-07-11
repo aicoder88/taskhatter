@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Copy, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Copy, Trash2, MessageSquare, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -20,6 +20,10 @@ export interface TaskCardProps {
   cost: number;
   ratingBump: number;
   status: "active" | "completed" | "waiting";
+  complaint?: string;
+  sources?: string[];
+  inspiration?: string;
+  mentions?: number;
   onStatusChange?: (
     id: string,
     status: "active" | "completed" | "waiting",
@@ -42,6 +46,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
   cost = 0,
   ratingBump = 0,
   status = "active",
+  complaint = "",
+  sources = [],
+  inspiration = "",
+  mentions = 0,
   onStatusChange = () => {},
   onEdit = () => {},
   onDuplicate = () => {},
@@ -62,9 +70,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   const handleCheckboxChange = (checked: boolean) => {
     if (checked) {
-      onStatusChange("completed");
+      onStatusChange(id, "completed");
     } else {
-      onStatusChange(status === "waiting" ? "waiting" : "active");
+      onStatusChange(id, status === "waiting" ? "waiting" : "active");
     }
   };
 
@@ -182,6 +190,52 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <span className="text-white/90 font-medium">{dueDate}</span>
           </div>
         </div>
+
+        {/* Complaint Information Section */}
+        {(complaint || sources?.length || inspiration || mentions) && (
+          <div className="mb-4 relative z-10">
+            {complaint && (
+              <div className="mb-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <MessageSquare className="h-3 w-3 text-red-400" />
+                  <span className="text-white/50 font-medium text-xs">Complaint</span>
+                </div>
+                <p className="text-white/80 text-xs italic leading-relaxed">
+                  "{complaint}"
+                </p>
+              </div>
+            )}
+            
+            <div className="flex flex-wrap gap-2 text-xs">
+              {inspiration && (
+                <div className="flex items-center gap-1">
+                  <ExternalLink className="h-3 w-3 text-blue-400" />
+                  <span className="text-white/50">Inspired by:</span>
+                  <span className="text-blue-400 font-medium">{inspiration}</span>
+                </div>
+              )}
+              
+              {mentions > 0 && (
+                <div className="flex items-center gap-1">
+                  <span className="text-white/50">Mentions:</span>
+                  <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40 border text-xs px-1 py-0">
+                    {mentions}
+                  </Badge>
+                </div>
+              )}
+              
+              {sources && sources.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <span className="text-white/50">Sources:</span>
+                  <span className="text-white/70 text-xs">
+                    {sources.slice(0, 2).join(", ")}
+                    {sources.length > 2 && ` +${sources.length - 2} more`}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-between items-center relative z-10">
           <div className="flex gap-2">
