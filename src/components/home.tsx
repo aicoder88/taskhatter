@@ -139,7 +139,7 @@ const seedTasks: Task[] = [
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(seedTasks);
-  const [showCompleted, setShowCompleted] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
   const handleAddTask = (newTask: Omit<Task, "id" | "status">) => {
