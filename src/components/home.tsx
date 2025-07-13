@@ -179,7 +179,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black text-white p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black text-white p-2 md:p-6 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
@@ -193,27 +193,27 @@ export default function Home() {
         transition={{ duration: 0.2 }}
         className="max-w-7xl mx-auto"
       >
-        <header className="flex flex-col md:flex-row justify-between items-center mb-8 backdrop-blur-md bg-black/30 p-6 rounded-xl border border-gray-800 shadow-lg relative overflow-hidden">
+        <header className="flex flex-col md:flex-row justify-between items-center mb-4 md:mb-8 backdrop-blur-md bg-black/30 p-3 md:p-6 rounded-xl border border-gray-800 shadow-lg relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10 opacity-50"></div>
-          <div className="flex items-center mb-4 md:mb-0 relative z-10">
+          <div className="flex items-center mb-3 md:mb-0 relative z-10 w-full md:w-auto justify-center md:justify-start">
             <img
               src="/logo-light-sm.png"
               alt="Hatter Pulse Logo"
-              className="h-16 w-16 mr-4 rounded-lg shadow-lg"
+              className="h-10 w-10 md:h-16 md:w-16 mr-3 md:mr-4 rounded-lg shadow-lg"
             />
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
+              <h1 className="text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
                 Hatter Pulse
               </h1>
-              <p className="text-sm text-white/60 font-medium">
+              <p className="text-xs md:text-sm text-white/60 font-medium">
                 Task Management System
               </p>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center gap-4 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center gap-3 relative z-10 w-full md:w-auto justify-center md:justify-end">
             <Button
               onClick={() => setIsAddTaskModalOpen(true)}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none backdrop-blur-md shadow-lg transition-all duration-200"
+              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none backdrop-blur-md shadow-lg transition-all duration-200 w-full sm:w-auto"
             >
               Add Task
             </Button>
@@ -223,13 +223,13 @@ export default function Home() {
                 checked={showCompleted}
                 onCheckedChange={setShowCompleted}
               />
-              <Label htmlFor="show-completed">Show Completed Tasks</Label>
+              <Label htmlFor="show-completed" className="text-sm">Show Completed Tasks</Label>
             </div>
           </div>
         </header>
 
         {/* Dashboard Header with Visualizations */}
-        <DashboardHeader tasks={tasks} className="mb-6" />
+        <DashboardHeader tasks={tasks} className="mb-4 md:mb-6" />
 
         <TaskBoard
           tasks={tasks}

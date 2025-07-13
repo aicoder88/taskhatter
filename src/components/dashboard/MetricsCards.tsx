@@ -100,7 +100,7 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ tasks, className = "" }) =>
   }
 
   return (
-    <div className={`flex gap-2 sm:gap-3 ${className}`}>
+    <div className={`flex flex-wrap gap-1.5 sm:gap-3 ${className}`}>
       {metrics.map((metric, index) => {
         const Icon = metric.icon;
         return (
@@ -109,19 +109,19 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ tasks, className = "" }) =>
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
-            className={`glass rounded-lg p-2 sm:p-3 min-w-[80px] sm:min-w-[100px] ${metric.bgColor} ${metric.borderColor} border`}
+            className={`glass rounded-lg p-1.5 sm:p-3 min-w-[70px] sm:min-w-[100px] ${metric.bgColor} ${metric.borderColor} border`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <Icon className={`h-4 w-4 ${metric.color}`} />
-              <span className="text-white/70 text-xs font-medium">
+            <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
+              <Icon className={`h-3 w-3 sm:h-4 sm:w-4 ${metric.color}`} />
+              <span className="text-white/70 text-[10px] sm:text-xs font-medium">
                 {metric.label}
               </span>
             </div>
             <div className="space-y-0.5">
-              <div className={`font-bold text-sm ${metric.color}`}>
+              <div className={`font-bold text-xs sm:text-sm ${metric.color}`}>
                 {metric.value}
               </div>
-              <div className="text-white/50 text-xs">
+              <div className="text-white/50 text-[9px] sm:text-xs">
                 {metric.subValue}
               </div>
             </div>

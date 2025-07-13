@@ -26,19 +26,18 @@ interface Task {
 }
 
 interface TaskSidebarProps {
-  task?: Task;
-  isOpen: boolean;
+  task: Task;
   onClose: () => void;
-  onSave: (task: Task) => void;
+  onUpdate: (task: Task) => void;
+  onDelete?: () => void;
 }
 
-const TaskSidebar = (
-  { task, isOpen, onClose, onSave }: TaskSidebarProps = {
-    isOpen: true,
-    onClose: () => {},
-    onSave: () => {},
-  },
-) => {
+const TaskSidebar = ({
+  task,
+  onClose,
+  onUpdate,
+  onDelete = () => {},
+}: TaskSidebarProps) => {
   const [editedTask, setEditedTask] = useState<Task>({
     id: "sample-task-1",
     title: "Deep Clean Bar Area",
@@ -75,11 +74,9 @@ const TaskSidebar = (
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, hasUnsavedChanges]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [hasUnsavedChanges]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -117,8 +114,7 @@ const TaskSidebar = (
     }
     
     // Save the task
-    onSave(editedTask);
-    onClose();
+    onUpdate(editedTask);
   };
 
   const getPriorityColor = (priority: string) => {
@@ -137,16 +133,17 @@ const TaskSidebar = (
   return (
     <div className="bg-black min-h-screen p-4">
       <motion.div
-        className={`fixed top-0 right-0 h-full w-[420px] bg-black/80 backdrop-blur-xl border-l border-white/20 shadow-2xl z-50 overflow-y-auto ${isOpen ? "block" : "hidden"}`}
-        initial={{ x: 420 }}
-        animate={{ x: isOpen ? 0 : 420 }}
+        className="fixed top-0 right-0 h-full w-full sm:w-[90%] md:w-[420px] bg-black/80 backdrop-blur-xl border-l border-white/20 shadow-2xl z-50 overflow-y-auto"
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
         transition={{ duration: 0.15, ease: "easeOut" }}
       >
-        <div className="p-6 h-full flex flex-col min-h-full">
+        <div className="p-4 sm:p-6 h-full flex flex-col min-h-full">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 sm:mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
                 Task Details
               </h2>
               <div className="flex items-center gap-2">
@@ -435,17 +432,30 @@ const TaskSidebar = (
             </div>
           </div>
 
-          {/* Cancel Button - At bottom */}
-          <div className="sticky bottom-0 bg-black/90 backdrop-blur-md border-t border-white/20 p-4 -mx-6 -mb-6 mt-auto">
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                onClick={onClose}
-                className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all px-6"
-              >
-                Cancel
-              </Button>
-            </div>
+          {/* Footer */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
+            <Button
+              variant="default"
+              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white"
+              onClick={handleSave}
+            >
+              Save Changes
+            </Button>
+            <Button
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <div className="flex-grow"></div>
+            <Button
+              variant="destructive"
+              className="bg-red-500/20 text-red-300 hover:bg-red-500/30"
+              onClick={onDelete}
+            >
+              Delete Task
+            </Button>
           </div>
         </div>
       </motion.div>

@@ -165,16 +165,16 @@ const TaskBoard = ({
   };
 
   return (
-    <div className="flex flex-col h-full glass rounded-xl p-6 overflow-hidden bg-black/20 relative">
+    <div className="flex flex-col h-full glass rounded-xl p-3 md:p-6 overflow-hidden bg-black/20 relative">
       {/* Decorative background elements */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-10 left-10 w-20 h-20 bg-purple-500 rounded-full blur-2xl"></div>
         <div className="absolute bottom-10 right-10 w-16 h-16 bg-pink-500 rounded-full blur-xl"></div>
       </div>
-      <div className="flex flex-1 gap-4 overflow-hidden relative z-10">
+      <div className="flex flex-col lg:flex-row flex-1 gap-4 overflow-hidden relative z-10">
         {/* Active Tasks Column */}
         <motion.div
-          className={`flex-1 glass rounded-xl p-4 overflow-y-auto transition-all duration-150 ${
+          className={`flex-1 glass rounded-xl p-3 md:p-4 overflow-y-auto transition-all duration-150 min-h-[300px] lg:min-h-0 ${
             dragOverColumn === "active" ? "drag-over" : ""
           }`}
           initial={{ opacity: 0, x: -20 }}
@@ -184,9 +184,9 @@ const TaskBoard = ({
           onDragLeave={handleDragLeave}
           onDrop={(e) => handleDrop(e, "active")}
         >
-          <h2 className="text-xl font-bold text-white/95 mb-6 sticky top-0 glass p-3 rounded-lg z-10 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30">
+          <h2 className="text-lg md:text-xl font-bold text-white/95 mb-4 md:mb-6 sticky top-0 glass p-2 md:p-3 rounded-lg z-10 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30">
             🚀 Active Tasks
-            <span className="ml-2 text-sm font-normal text-white/60">
+            <span className="ml-2 text-xs md:text-sm font-normal text-white/60">
               ({activeTasks.length})
             </span>
           </h2>
@@ -198,111 +198,82 @@ const TaskBoard = ({
                   dragOverColumn === "active" && dragOverIndex === 0 && draggingTask
                     ? "h-16 mb-2 flex items-center justify-center"
                     : "h-8"
+                } ${
+                  dragOverColumn === "active" && dragOverIndex === 0
+                    ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                    : ""
                 }`}
                 onDragOver={(e) => handleDragOver(e, "active", 0)}
                 onDrop={(e) => handleDrop(e, "active", 0)}
-              >
-                {dragOverColumn === "active" && dragOverIndex === 0 && draggingTask && (
-                  <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                    <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                  </div>
-                )}
-              </div>
+              ></div>
             )}
-            <AnimatePresence>
-              {activeTasks.map((task, index) => (
-                <div key={task.id}>
-                  {/* Drop zone before task */}
+
+            {/* Active tasks */}
+            {activeTasks.map((task, index) => (
+              <React.Fragment key={task.id}>
+                <TaskCard
+                  {...task}
+                  onStatusChange={handleTaskStatusChange}
+                  onClick={handleTaskClick}
+                  onEdit={() => handleTaskClick(task.id)}
+                  onDuplicate={() => onDuplicateTask(task.id)}
+                  onDelete={() => onDeleteTask(task.id)}
+                  draggable
+                  onDragStart={() => handleDragStart(task.id)}
+                  onDragEnd={handleDragEnd}
+                />
+                {/* Drop zone between tasks */}
+                {draggingTask && draggingTask !== task.id && (
                   <div
                     className={`transition-all duration-200 ${
-                      dragOverColumn === "active" && dragOverIndex === index && draggingTask !== task.id
-                        ? "h-16 mb-2 flex items-center justify-center"
-                        : "h-8"
+                      dragOverColumn === "active" && dragOverIndex === index + 1
+                        ? "h-16 my-2 flex items-center justify-center"
+                        : "h-0"
+                    } ${
+                      dragOverColumn === "active" && dragOverIndex === index + 1
+                        ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                        : ""
                     }`}
-                    onDragOver={(e) => handleDragOver(e, "active", index)}
-                    onDrop={(e) => handleDrop(e, "active", index)}
-                  >
-                    {dragOverColumn === "active" && dragOverIndex === index && draggingTask !== task.id && (
-                      <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                        <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.15, delay: index * 0.02 }}
-                  >
-                    <TaskCard
-                      {...task}
-                      onClick={() => handleTaskClick(task.id)}
-                      onEdit={() => handleTaskClick(task.id)}
-                      onDelete={() => onDeleteTask(task.id)}
-                      onDuplicate={() => onDuplicateTask(task.id)}
-                      onStatusChange={(status) =>
-                        handleTaskStatusChange(task.id, status as "active" | "completed" | "waiting")
-                      }
-                      draggable
-                      onDragStart={() => handleDragStart(task.id)}
-                      onDragEnd={handleDragEnd}
-                    />
-                  </motion.div>
-                  {/* Drop zone after last task */}
-                  {index === activeTasks.length - 1 && (
-                    <div
-                      className={`transition-all duration-200 ${
-                        dragOverColumn === "active" && dragOverIndex === activeTasks.length && draggingTask !== task.id
-                          ? "h-16 mt-2 flex items-center justify-center"
-                          : "h-8"
-                      }`}
-                      onDragOver={(e) => handleDragOver(e, "active", activeTasks.length)}
-                      onDrop={(e) => handleDrop(e, "active", activeTasks.length)}
-                    >
-                      {dragOverColumn === "active" && dragOverIndex === activeTasks.length && draggingTask !== task.id && (
-                        <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                          <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </AnimatePresence>
+                    onDragOver={(e) => handleDragOver(e, "active", index + 1)}
+                    onDrop={(e) => handleDrop(e, "active", index + 1)}
+                  ></div>
+                )}
+              </React.Fragment>
+            ))}
+
+            {/* Empty state */}
             {activeTasks.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`text-white/40 text-center p-8 border border-dashed border-white/20 rounded-xl glass transition-all duration-150 ${
-                  dragOverColumn === "active" ? "border-purple-500/40 bg-purple-500/10" : ""
-                }`}
-                onDragOver={(e) => handleDragOver(e, "active", 0)}
-                onDrop={(e) => handleDrop(e, "active", 0)}
-              >
-                <div className="text-lg font-medium mb-2">No active tasks</div>
-                <div className="text-sm">
-                  Drag completed tasks here or add new ones
-                </div>
-              </motion.div>
+              <div className="flex flex-col items-center justify-center h-32 border border-dashed border-white/20 rounded-xl p-4">
+                <p className="text-white/60 text-sm mb-2">No active tasks</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onAddTask}
+                  className="flex items-center gap-1 text-xs"
+                >
+                  <PlusCircle className="h-3 w-3" />
+                  Add Task
+                </Button>
+              </div>
             )}
           </div>
         </motion.div>
 
         {/* Waiting Tasks Column */}
         <motion.div
-          className={`flex-1 glass rounded-xl p-4 overflow-y-auto transition-all duration-150 ${
+          className={`flex-1 glass rounded-xl p-3 md:p-4 overflow-y-auto transition-all duration-150 min-h-[300px] lg:min-h-0 mt-4 lg:mt-0 ${
             dragOverColumn === "waiting" ? "drag-over" : ""
           }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15, delay: 0.1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15, delay: 0.05 }}
           onDragOver={(e) => handleDragOver(e, "waiting")}
           onDragLeave={handleDragLeave}
           onDrop={(e) => handleDrop(e, "waiting")}
         >
-          <h2 className="text-xl font-bold text-white/95 mb-6 sticky top-0 glass p-3 rounded-lg z-10 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+          <h2 className="text-lg md:text-xl font-bold text-white/95 mb-4 md:mb-6 sticky top-0 glass p-2 md:p-3 rounded-lg z-10 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
             ⏳ Waiting
-            <span className="ml-2 text-sm font-normal text-white/60">
+            <span className="ml-2 text-xs md:text-sm font-normal text-white/60">
               ({waitingTasks.length})
             </span>
           </h2>
@@ -311,221 +282,140 @@ const TaskBoard = ({
             {waitingTasks.length > 0 && draggingTask && (
               <div
                 className={`transition-all duration-200 ${
-                  dragOverColumn === "waiting" && dragOverIndex === 0 && draggingTask
+                  dragOverColumn === "waiting" && dragOverIndex === 0
                     ? "h-16 mb-2 flex items-center justify-center"
                     : "h-8"
+                } ${
+                  dragOverColumn === "waiting" && dragOverIndex === 0
+                    ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                    : ""
                 }`}
                 onDragOver={(e) => handleDragOver(e, "waiting", 0)}
                 onDrop={(e) => handleDrop(e, "waiting", 0)}
-              >
-                {dragOverColumn === "waiting" && dragOverIndex === 0 && draggingTask && (
-                  <div className="w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full shadow-lg shadow-yellow-400/50 animate-pulse">
-                    <div className="w-full h-full bg-gradient-to-r from-yellow-400/20 via-yellow-400 to-yellow-400/20 rounded-full"></div>
-                  </div>
-                )}
-              </div>
+              ></div>
             )}
-            <AnimatePresence>
-              {waitingTasks.map((task, index) => (
-                <div key={task.id}>
-                  {/* Drop zone before task */}
+
+            {/* Waiting tasks */}
+            {waitingTasks.map((task, index) => (
+              <React.Fragment key={task.id}>
+                <TaskCard
+                  {...task}
+                  onStatusChange={handleTaskStatusChange}
+                  onClick={handleTaskClick}
+                  onEdit={() => handleTaskClick(task.id)}
+                  onDuplicate={() => onDuplicateTask(task.id)}
+                  onDelete={() => onDeleteTask(task.id)}
+                  draggable
+                  onDragStart={() => handleDragStart(task.id)}
+                  onDragEnd={handleDragEnd}
+                />
+                {/* Drop zone between tasks */}
+                {draggingTask && draggingTask !== task.id && (
                   <div
                     className={`transition-all duration-200 ${
-                      dragOverColumn === "waiting" && dragOverIndex === index && draggingTask !== task.id
-                        ? "h-16 mb-2 flex items-center justify-center"
-                        : "h-8"
+                      dragOverColumn === "waiting" && dragOverIndex === index + 1
+                        ? "h-16 my-2 flex items-center justify-center"
+                        : "h-0"
+                    } ${
+                      dragOverColumn === "waiting" && dragOverIndex === index + 1
+                        ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                        : ""
                     }`}
-                    onDragOver={(e) => handleDragOver(e, "waiting", index)}
-                    onDrop={(e) => handleDrop(e, "waiting", index)}
-                  >
-                    {dragOverColumn === "waiting" && dragOverIndex === index && draggingTask !== task.id && (
-                      <div className="w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full shadow-lg shadow-yellow-400/50 animate-pulse">
-                        <div className="w-full h-full bg-gradient-to-r from-yellow-400/20 via-yellow-400 to-yellow-400/20 rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.15, delay: index * 0.02 }}
-                  >
-                    <TaskCard
-                      {...task}
-                      onClick={() => handleTaskClick(task.id)}
-                      onEdit={() => handleTaskClick(task.id)}
-                      onDelete={() => onDeleteTask(task.id)}
-                      onDuplicate={() => onDuplicateTask(task.id)}
-                      onStatusChange={(status) =>
-                        handleTaskStatusChange(task.id, status as "active" | "completed" | "waiting")
-                      }
-                      draggable
-                      onDragStart={() => handleDragStart(task.id)}
-                      onDragEnd={handleDragEnd}
-                    />
-                  </motion.div>
-                  {/* Drop zone after last task */}
-                  {index === waitingTasks.length - 1 && (
-                    <div
-                      className={`transition-all duration-200 ${
-                        dragOverColumn === "waiting" && dragOverIndex === waitingTasks.length && draggingTask !== task.id
-                          ? "h-16 mt-2 flex items-center justify-center"
-                          : "h-8"
-                      }`}
-                      onDragOver={(e) => handleDragOver(e, "waiting", waitingTasks.length)}
-                      onDrop={(e) => handleDrop(e, "waiting", waitingTasks.length)}
-                    >
-                      {dragOverColumn === "waiting" && dragOverIndex === waitingTasks.length && draggingTask !== task.id && (
-                        <div className="w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full shadow-lg shadow-yellow-400/50 animate-pulse">
-                          <div className="w-full h-full bg-gradient-to-r from-yellow-400/20 via-yellow-400 to-yellow-400/20 rounded-full"></div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </AnimatePresence>
+                    onDragOver={(e) => handleDragOver(e, "waiting", index + 1)}
+                    onDrop={(e) => handleDrop(e, "waiting", index + 1)}
+                  ></div>
+                )}
+              </React.Fragment>
+            ))}
+
+            {/* Empty state */}
             {waitingTasks.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`text-white/40 text-center p-8 border border-dashed border-white/20 rounded-xl glass transition-all duration-150 ${
-                  dragOverColumn === "waiting" ? "border-yellow-500/40 bg-yellow-500/10" : ""
-                }`}
-                onDragOver={(e) => handleDragOver(e, "waiting", 0)}
-                onDrop={(e) => handleDrop(e, "waiting", 0)}
-              >
-                <div className="text-lg font-medium mb-2">No waiting tasks</div>
-                <div className="text-sm">
-                  Drag tasks here when waiting for approval
-                </div>
-              </motion.div>
+              <div className="flex flex-col items-center justify-center h-32 border border-dashed border-white/20 rounded-xl p-4">
+                <p className="text-white/60 text-sm">No waiting tasks</p>
+              </div>
             )}
           </div>
         </motion.div>
 
         {/* Completed Tasks Column */}
-        <AnimatePresence>
-          {showCompleted && (
-            <motion.div
-              className={`flex-1 glass rounded-xl p-4 overflow-y-auto transition-all duration-150 ${
-                dragOverColumn === "completed" ? "drag-over" : ""
-              }`}
-              initial={{ opacity: 0, x: 20, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: "auto" }}
-              exit={{ opacity: 0, x: 20, width: 0 }}
-              transition={{ duration: 0.15 }}
-              onDragOver={(e) => handleDragOver(e, "completed")}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, "completed")}
-            >
-              <h2 className="text-xl font-bold text-white/95 mb-6 sticky top-0 glass p-3 rounded-lg z-10 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
-                ✅ Completed Tasks
-                <span className="ml-2 text-sm font-normal text-white/60">
-                  ({completedTasks.length})
-                </span>
-              </h2>
-              <div className="space-y-3">
-                {/* Drop zone at the beginning when dragging */}
-                {completedTasks.length > 0 && draggingTask && (
-                  <div
-                    className={`transition-all duration-200 ${
-                      dragOverColumn === "completed" && dragOverIndex === 0 && draggingTask
-                        ? "h-16 mb-2 flex items-center justify-center"
-                        : "h-8"
-                    }`}
-                    onDragOver={(e) => handleDragOver(e, "completed", 0)}
-                    onDrop={(e) => handleDrop(e, "completed", 0)}
-                  >
-                    {dragOverColumn === "completed" && dragOverIndex === 0 && draggingTask && (
-                      <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                        <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                <AnimatePresence>
-                  {completedTasks.map((task, index) => (
-                    <div key={task.id}>
-                      {/* Drop zone before task */}
-                      <div
-                        className={`transition-all duration-200 ${
-                          dragOverColumn === "completed" && dragOverIndex === index && draggingTask !== task.id
-                            ? "h-16 mb-2 flex items-center justify-center"
-                            : "h-8"
-                        }`}
-                        onDragOver={(e) => handleDragOver(e, "completed", index)}
-                        onDrop={(e) => handleDrop(e, "completed", index)}
-                      >
-                        {dragOverColumn === "completed" && dragOverIndex === index && draggingTask !== task.id && (
-                          <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                            <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                          </div>
-                        )}
-                      </div>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.15, delay: index * 0.02 }}
-                      >
-                        <TaskCard
-                          {...task}
-                          onClick={() => handleTaskClick(task.id)}
-                          onEdit={() => handleTaskClick(task.id)}
-                          onDelete={() => onDeleteTask(task.id)}
-                          onDuplicate={() => onDuplicateTask(task.id)}
-                          onStatusChange={(status) =>
-                            handleTaskStatusChange(task.id, status as "active" | "completed" | "waiting")
-                          }
-                          draggable
-                          onDragStart={() => handleDragStart(task.id)}
-                          onDragEnd={handleDragEnd}
-                        />
-                      </motion.div>
-                      {/* Drop zone after last task */}
-                      {index === completedTasks.length - 1 && (
-                        <div
-                          className={`transition-all duration-200 ${
-                            dragOverColumn === "completed" && dragOverIndex === completedTasks.length && draggingTask !== task.id
-                              ? "h-16 mt-2 flex items-center justify-center"
-                              : "h-8"
-                          }`}
-                          onDragOver={(e) => handleDragOver(e, "completed", completedTasks.length)}
-                          onDrop={(e) => handleDrop(e, "completed", completedTasks.length)}
-                        >
-                          {dragOverColumn === "completed" && dragOverIndex === completedTasks.length && draggingTask !== task.id && (
-                            <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full shadow-lg shadow-purple-400/50 animate-pulse">
-                              <div className="w-full h-full bg-gradient-to-r from-purple-400/20 via-purple-400 to-purple-400/20 rounded-full"></div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </AnimatePresence>
-                {completedTasks.length === 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className={`text-white/40 text-center p-8 border border-dashed border-white/20 rounded-xl glass transition-all duration-150 ${
-                      dragOverColumn === "completed" ? "border-purple-500/40 bg-purple-500/10" : ""
-                    }`}
-                    onDragOver={(e) => handleDragOver(e, "completed", 0)}
-                    onDrop={(e) => handleDrop(e, "completed", 0)}
-                  >
-                    <div className="text-lg font-medium mb-2">
-                      No completed tasks
-                    </div>
-                    <div className="text-sm">
-                      Drag active tasks here when done
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {showCompleted && (
+          <motion.div
+            className={`flex-1 glass rounded-xl p-3 md:p-4 overflow-y-auto transition-all duration-150 min-h-[300px] lg:min-h-0 mt-4 lg:mt-0 ${
+              dragOverColumn === "completed" ? "drag-over" : ""
+            }`}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.15, delay: 0.1 }}
+            onDragOver={(e) => handleDragOver(e, "completed")}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, "completed")}
+          >
+            <h2 className="text-lg md:text-xl font-bold text-white/95 mb-4 md:mb-6 sticky top-0 glass p-2 md:p-3 rounded-lg z-10 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+              ✅ Completed
+              <span className="ml-2 text-xs md:text-sm font-normal text-white/60">
+                ({completedTasks.length})
+              </span>
+            </h2>
+            <div className="space-y-3">
+              {/* Drop zone at the beginning when dragging */}
+              {completedTasks.length > 0 && draggingTask && (
+                <div
+                  className={`transition-all duration-200 ${
+                    dragOverColumn === "completed" && dragOverIndex === 0
+                      ? "h-16 mb-2 flex items-center justify-center"
+                      : "h-8"
+                  } ${
+                    dragOverColumn === "completed" && dragOverIndex === 0
+                      ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                      : ""
+                  }`}
+                  onDragOver={(e) => handleDragOver(e, "completed", 0)}
+                  onDrop={(e) => handleDrop(e, "completed", 0)}
+                ></div>
+              )}
+
+              {/* Completed tasks */}
+              {completedTasks.map((task, index) => (
+                <React.Fragment key={task.id}>
+                  <TaskCard
+                    {...task}
+                    onStatusChange={handleTaskStatusChange}
+                    onClick={handleTaskClick}
+                    onEdit={() => handleTaskClick(task.id)}
+                    onDuplicate={() => onDuplicateTask(task.id)}
+                    onDelete={() => onDeleteTask(task.id)}
+                    draggable
+                    onDragStart={() => handleDragStart(task.id)}
+                    onDragEnd={handleDragEnd}
+                  />
+                  {/* Drop zone between tasks */}
+                  {draggingTask && draggingTask !== task.id && (
+                    <div
+                      className={`transition-all duration-200 ${
+                        dragOverColumn === "completed" && dragOverIndex === index + 1
+                          ? "h-16 my-2 flex items-center justify-center"
+                          : "h-0"
+                      } ${
+                        dragOverColumn === "completed" && dragOverIndex === index + 1
+                          ? "border-2 border-dashed border-purple-500/50 rounded-lg bg-purple-500/10"
+                          : ""
+                      }`}
+                      onDragOver={(e) => handleDragOver(e, "completed", index + 1)}
+                      onDrop={(e) => handleDrop(e, "completed", index + 1)}
+                    ></div>
+                  )}
+                </React.Fragment>
+              ))}
+
+              {/* Empty state */}
+              {completedTasks.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-32 border border-dashed border-white/20 rounded-xl p-4">
+                  <p className="text-white/60 text-sm">No completed tasks</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Task Sidebar */}
@@ -533,9 +423,12 @@ const TaskBoard = ({
         {selectedTask && (
           <TaskSidebar
             task={selectedTask}
-            isOpen={!!selectedTask}
             onClose={handleCloseSidebar}
-            onSave={handleTaskUpdate}
+            onUpdate={handleTaskUpdate}
+            onDelete={() => {
+              onDeleteTask(selectedTask.id);
+              setSelectedTask(null);
+            }}
           />
         )}
       </AnimatePresence>

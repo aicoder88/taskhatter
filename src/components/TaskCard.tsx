@@ -106,7 +106,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       className={`w-full ${isDragging ? "opacity-50" : ""}`}
     >
       <Card
-        className={`glass-card relative w-full p-4 cursor-pointer overflow-hidden transition-all duration-150 ${
+        className={`glass-card relative w-full p-3 sm:p-4 cursor-pointer overflow-hidden transition-all duration-150 ${
           status === "completed" ? "opacity-70" : ""
         } ${status === "waiting" ? "border-yellow-500/40 bg-yellow-500/5" : ""} ${isHovered ? "neon-accent" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
@@ -127,8 +127,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           }`}
         />
 
-        <div className="flex justify-between items-start mb-3 relative z-10">
-          <div className="flex items-center gap-3">
+        <div className="flex justify-between items-start mb-2 sm:mb-3 relative z-10">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div data-no-card-click>
               <Checkbox
                 checked={status === "completed"}
@@ -136,7 +136,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 className="border-white/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
             </div>
-            <h3 className="font-semibold text-white/95 text-sm leading-relaxed break-words">
+            <h3 className="font-semibold text-white/95 text-xs sm:text-sm leading-relaxed break-words">
               {title}
             </h3>
           </div>
@@ -144,8 +144,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
           <div data-no-card-click>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1.5 rounded-lg hover:bg-white/10 transition-all duration-150 opacity-70 hover:opacity-100">
-                  <MoreHorizontal className="h-4 w-4 text-white" />
+                <button 
+                  className="p-1 sm:p-1.5 rounded-lg hover:bg-white/10 transition-all duration-150 opacity-70 hover:opacity-100"
+                  aria-label="Task options"
+                >
+                  <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -178,38 +181,38 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4 relative z-10">
           <div className="text-xs">
-            <span className="block text-white/50 font-medium mb-1">Owner</span>
-            <span className="text-white/90 font-medium">{owner}</span>
+            <span className="block text-white/50 font-medium mb-0.5 sm:mb-1 text-[10px] sm:text-xs">Owner</span>
+            <span className="text-white/90 font-medium text-xs sm:text-sm">{owner}</span>
           </div>
           <div className="text-xs">
-            <span className="block text-white/50 font-medium mb-1">
+            <span className="block text-white/50 font-medium mb-0.5 sm:mb-1 text-[10px] sm:text-xs">
               Due Date
             </span>
-            <span className="text-white/90 font-medium">{dueDate}</span>
+            <span className="text-white/90 font-medium text-xs sm:text-sm">{dueDate}</span>
           </div>
         </div>
 
         {/* Complaint Information Section */}
         {(complaint || sources?.length || inspiration || mentions) && (
-          <div className="mb-4 relative z-10">
+          <div className="mb-3 sm:mb-4 relative z-10">
             {complaint && (
               <div className="mb-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <MessageSquare className="h-3 w-3 text-red-400" />
-                  <span className="text-white/50 font-medium text-xs">Complaint</span>
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
+                  <MessageSquare className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-400" />
+                  <span className="text-white/50 font-medium text-[10px] sm:text-xs">Complaint</span>
                 </div>
-                <p className="text-white/80 text-xs italic leading-relaxed">
+                <p className="text-white/80 text-[10px] sm:text-xs italic leading-relaxed">
                   "{complaint}"
                 </p>
               </div>
             )}
             
-            <div className="flex flex-wrap gap-2 text-xs">
+            <div className="flex flex-wrap gap-1 sm:gap-2 text-[10px] sm:text-xs">
               {inspiration && (
                 <div className="flex items-center gap-1">
-                  <ExternalLink className="h-3 w-3 text-blue-400" />
+                  <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-blue-400" />
                   <span className="text-white/50">Inspired by:</span>
                   <span className="text-blue-400 font-medium">{inspiration}</span>
                 </div>
@@ -218,7 +221,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               {mentions > 0 && (
                 <div className="flex items-center gap-1">
                   <span className="text-white/50">Mentions:</span>
-                  <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40 border text-xs px-1 py-0">
+                  <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40 border text-[10px] sm:text-xs px-1 py-0">
                     {mentions}
                   </Badge>
                 </div>
@@ -227,7 +230,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               {sources && sources.length > 0 && (
                 <div className="flex items-center gap-1">
                   <span className="text-white/50">Sources:</span>
-                  <span className="text-white/70 text-xs">
+                  <span className="text-white/70 text-[10px] sm:text-xs">
                     {sources.slice(0, 2).join(", ")}
                     {sources.length > 2 && ` +${sources.length - 2} more`}
                   </span>
@@ -238,35 +241,26 @@ const TaskCard: React.FC<TaskCardProps> = ({
         )}
 
         <div className="flex justify-between items-center relative z-10">
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2">
             <Badge
-              className={`${priorityColors[priority]} border text-xs font-medium px-2 py-1`}
+              className={`${priorityColors[priority]} border text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1`}
             >
               {priority}
             </Badge>
             {status === "waiting" && (
-              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/40 border text-xs font-medium px-2 py-1">
+              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/40 border text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1">
                 ⏳ Waiting
               </Badge>
             )}
-            {status === "completed" && (
-              <Badge className="bg-green-500/20 text-green-300 border-green-500/40 border text-xs font-medium px-2 py-1">
-                ✅ Done
-              </Badge>
-            )}
           </div>
-          <div className="flex gap-4 text-xs">
-            <div className="text-right">
-              <div className="text-white/50 font-medium">Cost</div>
-              <div className="font-semibold text-white/90">
-                ${cost.toLocaleString()}
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col items-end">
+              <span className="text-white/50 text-[10px] sm:text-xs font-medium">Cost</span>
+              <span className="text-white/90 text-xs sm:text-sm font-medium">${cost}</span>
             </div>
-            <div className="text-right">
-              <div className="text-white/50 font-medium">Rating</div>
-              <div className="font-semibold text-emerald-400">
-                +{ratingBump.toFixed(2)}
-              </div>
+            <div className="flex flex-col items-end">
+              <span className="text-white/50 text-[10px] sm:text-xs font-medium">Rating</span>
+              <span className="text-white/90 text-xs sm:text-sm font-medium">+{ratingBump}</span>
             </div>
           </div>
         </div>
